@@ -15,11 +15,12 @@ const sequelize = new Sequelize(
     }
 );
 
-try {
-    sequelize.authenticate();
-    console.log('Connexion à la base de données MySQL réussie !');
-} catch (error) {
-    console.log('Connexion à la base de donnée impossible ! Erreur :', error);
-}
+sequelize.authenticate()
+    .then(() => {
+        console.log('Connexion à la base de données MySQL réussie !');
+    })
+    .catch(err => {
+        console.error('Echec de la connexion à la base de données MySQL :', err);
+    });
 
 module.exports = app;
