@@ -17,7 +17,7 @@ const app = express();
 /***************************************Appel des fichiers de gestion des routes de l'application**************************************/
 
 const usersRoutes = require('./routes/users');
-//const postsRoutes = require('./routes/posts');
+const postsRoutes = require('./routes/posts');
 
 /***************************************Limitation du nombre de requêtes pour une même adresse IP**************************************/
 //Le but est d'empêcher les attaques en force brute
@@ -68,7 +68,7 @@ app.use(bodyParser.urlencoded({ extended: true })); //Permet de parser dans les 
 app.use(bodyParser.json()); //Indique que l'on veut parser du JSON
 
 app.use('/api/users', usersRoutes); //Utilisation du routeur users pour toutes les demandes vers '/api/users/'
-//app.use('/api/posts', postsRoutes); //Utilisation du routeur sauces pour toutes les demandes vers '/api/posts/'
+app.use('/api/posts', postsRoutes); //Utilisation du routeur sauces pour toutes les demandes vers '/api/posts/'
 
 /********************************************************Export de l'application*******************************************************/
 

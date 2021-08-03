@@ -33,14 +33,17 @@ exports.signupUser = (req, res, next) => {
         à condition que l'email et le mot de passe respectent les expressions régulières*/
             bcrypt.hash(password, 10) //Hash du mot de passe par bcrypt avec 10 passes
             .then(hash => {//En cas de réussite du hash
-                const newUser = models.User.create({ //On crée l'utilisateur
+                models.User.create({ //On crée l'utilisateur
                     firstname: firstname,
                     lastname: lastname,
                     email: email,
                     password: hash
-                });
-                res.status(201).json({ message: 'Nouvel utilisateur enregistré !', userId: newUser.id }); //Statut et message de réussite
-                next();
+                })
+                .then(newUser => {
+                    res.status(201).json({ message: 'Nouvel utilisateur enregistré !' }); //Statut et message de réussite
+                    next();
+                })
+                .catch(error => res.status(500).json({ error }));
             })
             .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
         } else {//Si l'utilisateur est trouvé
@@ -84,17 +87,17 @@ exports.loginUser = (req, res, next) => {
 
 /***********************************************Controller d'affichage d'un utilisateur***********************************************/
 
-exports.getProfile = (req, res, next) => {
+exports.getMyProfile = (req, res, next) => {
     //Récupération des données de l'authorisation présent dans le header pour en extraire l'id de l'utilisateur connecté
     const authData = req.headers['authorization'];
-    const id = jwt.getUId(authData);
+    const uId = jwt.getUId(authData);
     
     if(id < 0) {
         return res.status(400).json({ error: 'Token incorrect !'});
     }
-    models.User.findOne({//On recherche de l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
+    models.User.findOne({//On recherche l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
         attributes: [ 'id', 'firstname', 'lastname', 'email' ],
-        where: { id: id }
+        where: { id: uId }
     })
     .then(userFound => {
         if(userFound) {//Si l'utilisateur est présent en base
@@ -109,14 +112,14 @@ exports.getProfile = (req, res, next) => {
 
 /*********************************************Controller de modification de l'utilisateur*********************************************/
 
-exports.updateUser = (req, res, next) => {
+exports.updateMyProfile = (req, res, next) => {
     //Récupération des données de l'authorisation présent dans le header pour en extraire l'id
     const authData = req.headers['authorization'];
-    const id = jwt.getUId(authData);
+    const uId = jwt.getUId(authData);
     
     models.User.findOne({//On recherche de l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
         attributes: [ 'id', 'firstname', 'lastname', 'email', 'password' ],
-        where: { id: id }
+        where: { id: uId }
     })
     .then(userFound => {
         if(userFound) {//Si l'utilisateur est présent en base
@@ -143,18 +146,19 @@ exports.updateUser = (req, res, next) => {
                     if(email.match(emailSchema) && password.match(passwordSchema)) {//Si les saisies vérifient les expressions régulières
                         bcrypt.hash(password, 10) //Hash du mot de passe par bcrypt avec 10 passes
                         .then(hash => {
-                            const updatedUser = userFound.update({//Mise à jour de l'utilisateur
+                            models.User.update({//Mise à jour de l'utilisateur cible par son Id
                                 firstname: (firstname ? firstname : userFound.firstname),
                                 lastname: (lastname ? lastname : userFound.lastname),
                                 email: (email ? email : userFound.email),
                                 password: hash
-                            });
-                            return updatedUser;
+                            }, { 
+                                where: { id: userFound.id }
+                            })
                         })
                         .then(() => {//On va rechercher à nouveau l'utilisateur...
                             models.User.findOne({
                                 attributes: [ 'id', 'firstname', 'lastname', 'email' ],
-                                where: { id: id }
+                                where: { id: uId }
                             })
                             .then(updatedProfile => {//...pour en afficher les informations modifiées
                                 res.status(200).json({ message: 'Profil mis à jour !', updatedProfile: updatedProfile });
@@ -178,14 +182,14 @@ exports.updateUser = (req, res, next) => {
 
 /*********************************************Controller de suppression de l'utilisateur**********************************************/
 
-exports.deleteUser = (req, res, next) => {
+exports.deleteMyProfile = (req, res, next) => {
     //Récupération des données de l'authorisation présent dans le header pour en extraire l'id
     const authData = req.headers['authorization'];
-    const id = jwt.getUId(authData);
+    const uId = jwt.getUId(authData);
     
     models.User.findOne({//On recherche de l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
         attributes: [ 'id', 'password' ],
-        where: { id: id }
+        where: { id: uId }
     })
     .then(userFound => {
         if(userFound) {//Si l'utilisateur est présent en base
@@ -200,15 +204,15 @@ exports.deleteUser = (req, res, next) => {
             .then(passwordMatch => {
                 if(!passwordMatch) {//S'ils ne correspondent pas
                     return res.status(409).json({ error: 'Mot de passe incorrect !' });
-                } else {//S'ils correspondent
-                    try {
-                        userFound.destroy();
-                        res.status(200).json({ message: 'Profil supprimé !' });
+                } else {//S'ils correspondent, suppression du post ciblé par son Id
+                    userFound.destroy({
+                        where: { id: userFound.id }
+                    })
+                    .then(() => {//Si la commande fonctionne on retourne un message de réussite
+                        res.status(200).json( {message: 'Profil supprimé ' } ); 
                         next();
-                    }
-                    catch (error) {
-                        return res.status(500).json({ error }); //En cas d'erreur on retourne un statut d'erreur et l'erreur
-                    }
+                    })
+                    .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
                 }
             })
             .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur   

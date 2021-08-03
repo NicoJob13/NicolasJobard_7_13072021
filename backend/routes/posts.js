@@ -1,12 +1,13 @@
-/*--------------------------------------------Les routes destinées à gérer les utilisateurs---------------------------------------------
+/*-----------------------------------------------Les routes destinées à gérer les posts-------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------*/
-//Ces routes vont permettre à l'utilisateur de créer son compte, de se connecter à l'application, de modifier et supprimer son compte.
+//Ces routes vont permettre à l'utilisateur de créer un post, de le modifier et le supprimer.
 
 /***************************************Appel des packages, controllers et middlewares nécessaires**************************************/
 
 const express = require('express');
-const usersCtrl = require('../controllers/users');
+const postsCtrl = require('../controllers/posts');
 //const auth = require('../middleware/auth');
+//const multer = require('../middleware/multer-config'); //Middleware de configuration du package de gestion des fichiers image
 
 /**********************************************************Création du routeur*********************************************************/
 
@@ -14,11 +15,10 @@ const router = express.Router();
 
 /************************************Les routes permettant d'appliquer la logique de fonctionnement************************************/
 
-router.post('/signup', usersCtrl.signupUser); //Inscription d'un utilisateur
-router.post('/login', usersCtrl.loginUser); //Connexion d'un utilisateur
-router.get('/myaccount', usersCtrl.getMyProfile); //Affichage du profil d'un utilisateur
-router.put('/myaccount', usersCtrl.updateMyProfile); //Modification d'un utilisateur
-router.delete('/myaccount', usersCtrl.deleteMyProfile); //Suppression d'un utilisateur
+router.get('/', postsCtrl.getAllPosts); //Affichage de tous les posts
+router.post('/', postsCtrl.createPost); //Création d'un post
+router.put('/:id', postsCtrl.modifyPost); //Modification d'un post
+router.delete('/:id', postsCtrl.deletePost); //Suppression d'un post
 
 /****************************Export du router pour utilisation dans le fichier principal de l'application*****************************/
 
