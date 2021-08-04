@@ -28,6 +28,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
+      userRole: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
       text: {
         allowNull: false,
         type: Sequelize.TEXT

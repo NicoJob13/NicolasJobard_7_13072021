@@ -15,13 +15,14 @@ exports.signupUser = (req, res, next) => {
     const lastname = req.body.lastname;
     const email = req.body.email;
     const password = req.body.password;
+    const role= req.body.role;
     
     //Expressions régulières à vérifier pour l'e-mail et le mot de passe afin d'éviter les attaques
     const emailSchema = /^[A-z0-9._-]+[@][a-zA-Z0-9._-]+[.][A-z]{2,}$/; 
     const passwordSchema = /^(?=.*?[0-9])(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[_!@#$£µ=§%^&*?-\\/\\]).{8,}$/;
 
     //Vérification que toutes les paramètres nécessaires à la requête sont présents
-    if(firstname == null || lastname == null || email == null || password == null) {//Si un des champs n'est pas renseigné
+    if(firstname == null || lastname == null || email == null || password == null || role == null) {//Si un des champs n'est pas renseigné
         return res.status(400).json({ 'error': 'Informations manquantes'});
     }
     models.User.findOne({ //On recherche si l'adresse email est déjà présente dans la DB
@@ -37,7 +38,8 @@ exports.signupUser = (req, res, next) => {
                     firstname: firstname,
                     lastname: lastname,
                     email: email,
-                    password: hash
+                    password: hash,
+                    role: role
                 })
                 .then(newUser => {
                     res.status(201).json({ message: 'Nouvel utilisateur enregistré !' }); //Statut et message de réussite
@@ -74,7 +76,7 @@ exports.loginUser = (req, res, next) => {
                     return res.status(401).json({ error: 'Mot de passe incorrect !' }); //On renvoie un statut d'erreur et un message
                 }
                 res.status(200).json({ //S'ils correspondent la réponse contient :
-                    userId: userExist.id, //le userId,
+                    userId: userExist.id, //l'id de l'utilisateur,
                     token: jwt.genToken(userExist) //un token d'authentification encodé
                 });
                 next();
@@ -96,7 +98,7 @@ exports.getMyProfile = (req, res, next) => {
         return res.status(400).json({ error: 'Token incorrect !'});
     }
     models.User.findOne({//On recherche l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
-        attributes: [ 'id', 'firstname', 'lastname', 'email' ],
+        attributes: [ 'id', 'firstname', 'lastname', 'email', 'role' ],
         where: { id: uId }
     })
     .then(userFound => {
@@ -118,7 +120,7 @@ exports.updateMyProfile = (req, res, next) => {
     const uId = jwt.getUId(authData);
     
     models.User.findOne({//On recherche de l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
-        attributes: [ 'id', 'firstname', 'lastname', 'email', 'password', 'updateAt' ],
+        attributes: [ 'id', 'firstname', 'lastname', 'email', 'password', 'role', 'updateAt' ],
         where: { id: uId }
     })
     .then(userFound => {
@@ -128,6 +130,7 @@ exports.updateMyProfile = (req, res, next) => {
             const lastname = req.body.lastname;
             const email = req.body.email;
             const password = req.body.password;
+            const role = req.body.role;
             const controlPassword = req.body.controlPassword; //Le mot de passe saisi pour le contrôle d'identité
             
             //Récupération du mot de passe de l'utilisateur en base de données
@@ -150,6 +153,7 @@ exports.updateMyProfile = (req, res, next) => {
                                 firstname: (firstname ? firstname : userFound.firstname),
                                 lastname: (lastname ? lastname : userFound.lastname),
                                 email: (email ? email : userFound.email),
+                                role: (role ? role : userFound.role),
                                 password: hash,
                                 updatedAt: new Date()
                             }, { 
@@ -158,7 +162,7 @@ exports.updateMyProfile = (req, res, next) => {
                         })
                         .then(() => {//On va rechercher à nouveau l'utilisateur...
                             models.User.findOne({
-                                attributes: [ 'id', 'firstname', 'lastname', 'email', 'updatedAt' ],
+                                attributes: [ 'id', 'firstname', 'lastname', 'email', 'role', 'updatedAt' ],
                                 where: { id: uId }
                             })
                             .then(updatedProfile => {//...pour en afficher les informations modifiées

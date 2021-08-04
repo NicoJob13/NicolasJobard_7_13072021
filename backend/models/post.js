@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.STRING
     },
+    userRole: {
+      allowNull: false,
+      type: DataTypes.STRING
+    },
     text: DataTypes.TEXT,
     //picture: DataTypes.BLOB('long')
   }, {
