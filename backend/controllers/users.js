@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt'); //Package de chiffrement pour le cryptage du m
 const jwt = require('../utils/jwt'); //Fichier contenant les outils de gestion de tokens d'identification
 const models = require('../models'); //Modèles dans la DB
 
-/***********************************************Controller de création de l'utilisateur***********************************************/
+/***********************************************Controller de création d'un utilisateur************************************************/
 
 exports.signupUser = (req, res, next) => {
     //Paramètres de requête, saisis dans les champs du formulaire
@@ -53,7 +53,7 @@ exports.signupUser = (req, res, next) => {
     .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
 };
 
-/***********************************************Controller de connexion de l'utilisateur**********************************************/
+/***********************************************Controller de connexion d'un utilisateur***********************************************/
 
 exports.loginUser = (req, res, next) => {
     //Récupération des information saisies dans les champs de formulaire
@@ -110,7 +110,7 @@ exports.getMyProfile = (req, res, next) => {
     .catch(error => res.status(404).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
 };
 
-/*********************************************Controller de modification de l'utilisateur*********************************************/
+/*********************************************Controller de modification d'un utilisateur**********************************************/
 
 exports.updateMyProfile = (req, res, next) => {
     //Récupération des données de l'authorisation présent dans le header pour en extraire l'id
@@ -118,7 +118,7 @@ exports.updateMyProfile = (req, res, next) => {
     const uId = jwt.getUId(authData);
     
     models.User.findOne({//On recherche de l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
-        attributes: [ 'id', 'firstname', 'lastname', 'email', 'password' ],
+        attributes: [ 'id', 'firstname', 'lastname', 'email', 'password', 'updateAt' ],
         where: { id: uId }
     })
     .then(userFound => {
@@ -150,14 +150,15 @@ exports.updateMyProfile = (req, res, next) => {
                                 firstname: (firstname ? firstname : userFound.firstname),
                                 lastname: (lastname ? lastname : userFound.lastname),
                                 email: (email ? email : userFound.email),
-                                password: hash
+                                password: hash,
+                                updatedAt: new Date()
                             }, { 
                                 where: { id: userFound.id }
                             })
                         })
                         .then(() => {//On va rechercher à nouveau l'utilisateur...
                             models.User.findOne({
-                                attributes: [ 'id', 'firstname', 'lastname', 'email' ],
+                                attributes: [ 'id', 'firstname', 'lastname', 'email', 'updatedAt' ],
                                 where: { id: uId }
                             })
                             .then(updatedProfile => {//...pour en afficher les informations modifiées
@@ -180,7 +181,7 @@ exports.updateMyProfile = (req, res, next) => {
     .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
 };
 
-/*********************************************Controller de suppression de l'utilisateur**********************************************/
+/*********************************************Controller de suppression d'un utilisateur***********************************************/
 
 exports.deleteMyProfile = (req, res, next) => {
     //Récupération des données de l'authorisation présent dans le header pour en extraire l'id

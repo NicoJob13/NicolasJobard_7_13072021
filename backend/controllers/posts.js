@@ -10,7 +10,6 @@ const jwt = require('../utils/jwt'); //Fichier contenant les outils de gestion d
 
  exports.getAllPosts = (req, res, next) => {
     models.Post.findAll({//Récupération de tous les posts avec les informations précisées dans 'attributes' et tri chronologique inverse
-        attributes: [ 'id', 'userId', 'userName', 'text' ],
         order: [[ 'createdAt', 'DESC' ]]
     })
         .then(posts => {//En cas de réussite
@@ -25,11 +24,11 @@ const jwt = require('../utils/jwt'); //Fichier contenant les outils de gestion d
 exports.createPost = (req, res, next) => {
     //Récupération des données de l'authorisation présente dans le header pour en extraire l'id de l'utilisateur connecté
     const authData = req.headers['authorization'];
-    const uid = jwt.getUId(authData);
+    const uId = jwt.getUId(authData);
     
     models.User.findOne({//On recherche l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
         attributes: [ 'id', 'firstname', 'lastname' ],
-        where: { id: uid }
+        where: { id: uId }
     })
     .then(userFound => {
         if(userFound) {//Si l'utilisateur est trouvé dans la base
@@ -44,11 +43,11 @@ exports.createPost = (req, res, next) => {
                 })
                 .then(createdPost => {//On va rechercher le post...
                     models.Post.findOne({
-                        attributes: [ 'id', 'userId', 'userName', 'text' ],
+                        attributes: [ 'id', 'userId', 'userName', 'text', 'createdAt' ],
                         where: { id: createdPost.id }
                     })
                     .then(newPost => {//...pour en afficher les données
-                        res.status(200).json( {message: 'Nouveau post enregistré !', newPost: newPost} ); //Retourne l'objet
+                        res.status(200).json( { message: 'Nouveau post enregistré !', newPost: newPost } ); //Retourne l'objet
                         next();
                     })
                     .catch(error => res.status(404).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
@@ -64,36 +63,37 @@ exports.createPost = (req, res, next) => {
     .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
 };
 
-/***************************************************Controller de modification de post************************************************/
+/**************************************************Controller de modification d'un post***********************************************/
 
 exports.modifyPost = (req, res, next) => {
     //Récupération des données de l'authorisation présent dans le header pour en extraire l'id
     const authData = req.headers['authorization'];
-    const uid = jwt.getUId(authData);
+    const uId = jwt.getUId(authData);
 
     //Récupération de l'id du post présent dans les paramètres de la requête
-    const postId = req.params.id;
+    const pId = req.params.id;
 
-    models.Post.findOne({//On recherche le poste à modifier en fonction de son id et on récupère les champs précisés dans 'attributes'
-        attributes: [ 'userId', 'userName', 'text' ],
-        where: { id: postId }
+    models.Post.findOne({//On recherche le post à modifier en fonction de son id et on récupère les champs précisés dans 'attributes'
+        attributes: [ 'userId', 'text', 'updatedAt' ],
+        where: { id: pId }
     })
     .then(postFound => {
-        if(postFound && uid === postFound.userId) {//Si le post existe en base et que les identifiants utilisateur du post et connecté correspondent 
+        if(postFound && uId === postFound.userId) {//Si le post existe en base et que les identifiants utilisateur du post et connecté correspondent 
             //Recupération du texte saisi
             const text = req.body.text;
             
             models.Post.update({//Mise à jour du post ciblé par son Id
-                text: (text ? text : postFound.text)
+                text: (text ? text : postFound.text),
+                updatedAt: new Date()
             },
-            { where: { id: postId }}
+            { where: { id: pId } }
             )
             .then(() => {//On va rechercher à nouveau le post...
                 models.Post.findOne({
-                    attributes: [ 'text' ],
-                    where: { id: postId }
+                    attributes: [ 'id', 'text', 'updatedAt' ],
+                    where: { id: pId }
                 })
-                .then(updatedPost => {//...pour en afficher le texte modifié
+                .then(updatedPost => {//...pour en afficher le texte modifié et la date de modification
                     res.status(200).json( {message: 'Post modifié !', updatedPost: updatedPost} );
                     next();
                 })
@@ -107,25 +107,25 @@ exports.modifyPost = (req, res, next) => {
     .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
 };
 
-/***************************************************Controller de suppression de sauce*************************************************/
+/**************************************************Controller de suppression d'un post*************************************************/
 
 exports.deletePost = (req, res, next) => {
     //Récupération des données de l'authorisation présent dans le header pour en extraire l'id
     const authData = req.headers['authorization'];
-    const uid = jwt.getUId(authData);
+    const uId = jwt.getUId(authData);
 
     //Récupération de l'id du post présent dans les paramètres de la requête
-    const postId = req.params.id;
+    const pId = req.params.id;
 
-    models.Post.findOne({//On recherche le poste à modifier en fonction de son id et on récupère les champs précisés dans 'attributes'
+    models.Post.findOne({//On recherche le post à supprimer en fonction de son id et on récupère les champs précisés dans 'attributes'
         attributes: [ 'userId' ],
-        where: { id: postId }
+        where: { id: pId }
     })
     .then(postFound => {
-        if(postFound && uid === postFound.userId) {//Si le post existe en base et que les identifiants utilisateur du post et connecté correspondent
+        if(postFound && uId === postFound.userId) {//Si le post existe en base et que les identifiants utilisateur du post et connecté correspondent
             
             models.Post.destroy({//Suppression du post ciblé par son Id
-                where: { id: postId }
+                where: { id: pId }
             })
             .then(() => {//Si la commande fonctionne on retourne un message de réussite
                 res.status(200).json( {message: 'Post supprimé !' } ); 
