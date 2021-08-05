@@ -18,10 +18,6 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   Post.init({
-    userId: {
-      allowNull: false,
-      type: DataTypes.INTEGER
-    },
     userName: {
       allowNull: false,
       type: DataTypes.STRING
@@ -31,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING
     },
     text: DataTypes.TEXT,
-    //picture: DataTypes.BLOB('long')
+    pictureUrl: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Post',

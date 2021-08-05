@@ -6,7 +6,7 @@
 
 const express = require('express');
 const usersCtrl = require('../controllers/users');
-//const auth = require('../middleware/auth');
+const auth = require('../middleware/auth');
 
 /**********************************************************Création du routeur*********************************************************/
 
@@ -16,9 +16,9 @@ const router = express.Router();
 
 router.post('/signup', usersCtrl.signupUser); //Inscription d'un utilisateur
 router.post('/login', usersCtrl.loginUser); //Connexion d'un utilisateur
-router.get('/myaccount', usersCtrl.getMyProfile); //Affichage du profil d'un utilisateur
-router.put('/myaccount', usersCtrl.updateMyProfile); //Modification d'un utilisateur
-router.delete('/myaccount', usersCtrl.deleteMyProfile); //Suppression d'un utilisateur
+router.get('/myaccount', auth, usersCtrl.getMyProfile); //Affichage du profil d'un utilisateur
+router.put('/myaccount', auth, usersCtrl.updateMyProfile); //Modification d'un utilisateur
+router.delete('/myaccount', auth, usersCtrl.deleteMyProfile); //Suppression d'un utilisateur
 
 /****************************Export du router pour utilisation dans le fichier principal de l'application*****************************/
 

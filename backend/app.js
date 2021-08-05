@@ -8,7 +8,7 @@ const Sequelize = require('sequelize'); //Package permettant l'utilisation de l'
 const helmet = require('helmet'); //Package de sécurisation des en-têtes
 const rateLimit = require('express-rate-limit'); //Package permettant de limiter les requêtes pour une même adresse IP
 const bodyParser = require('body-parser'); //Package d'analyse du corps d'une requête
-//const path = require('path'); //Package permettant d'accéder au path du serveur
+const path = require('path'); //Package permettant d'accéder au path du serveur
 
 /****************************************************Création de l'API avec Express****************************************************/
 
@@ -67,6 +67,8 @@ app.use(helmet()); //Middleware permettant de sécuriser les en-têtes
 
 app.use(bodyParser.urlencoded({ extended: true })); //Permet de parser dans les objets inclus dans d'autres
 app.use(bodyParser.json()); //Indique que l'on veut parser du JSON
+
+app.use('/images', express.static(path.join(__dirname, 'images'))); //Gestion du routage de la ressource 'images' en statique
 
 app.use('/api/users', usersRoutes); //Utilisation du routeur users pour toutes les demandes vers '/api/users/'
 app.use('/api/posts', postsRoutes); //Utilisation du routeur posts pour toutes les demandes vers '/api/posts/'

@@ -45,8 +45,8 @@ exports.createComment = (req, res, next) => {
             
             if(text != null) {//Si des données sont renseignées
                 models.Comment.create({//Création du commentaire
-                    userId: userFound.id,
-                    postId: pId,
+                    UserId: userFound.id,
+                    PostId: pId,
                     userName: userFound.firstname + ' ' + userFound.lastname,
                     userRole: userFound.role,
                     text: text
