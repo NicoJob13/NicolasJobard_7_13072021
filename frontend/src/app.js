@@ -1,17 +1,15 @@
+import React from 'react';
+import Routes from './components/routes';
+
 //import logo from '';
 import './styles/styles.css';
 
-function App() {
+const App = () => {
   return (
     <div>
-      <header>
-        <img /*src={logo} alt="logo de l'entreprise" *//>
-        <p>
-          Bienvenue chez Groupomania !
-        </p>
-      </header>
+      <Routes />
     </div>
   );
-}
+};
 
 export default App;
