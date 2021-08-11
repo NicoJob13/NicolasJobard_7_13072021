@@ -1,7 +1,5 @@
 const jwt = require('jsonwebtoken'); //Package de gestion de token d'identification
-
-//Appel du fichier de configuration de dotenv 
-require('dotenv').config();
+require('dotenv').config({path: './config/.env'}); //Appel du fichier de configuration de dotenv
 
 exports.genToken = (userData) => {
     return jwt.sign( //un token d'authentification encodé

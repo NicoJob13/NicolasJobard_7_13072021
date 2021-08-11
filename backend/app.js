@@ -8,7 +8,10 @@ const Sequelize = require('sequelize'); //Package permettant l'utilisation de l'
 const helmet = require('helmet'); //Package de sécurisation des en-têtes
 const rateLimit = require('express-rate-limit'); //Package permettant de limiter les requêtes pour une même adresse IP
 const bodyParser = require('body-parser'); //Package d'analyse du corps d'une requête
+const cookieParser = require('cookie-parser'); //Package d'analyse du contenu d'un cookie
 const path = require('path'); //Package permettant d'accéder au path du serveur
+const { checkAuth, requireAuth } = require('./middleware/auth');
+const cors = require('cors');
 
 /****************************************************Création de l'API avec Express****************************************************/
 
@@ -16,6 +19,7 @@ const app = express();
 
 /***************************************Appel des fichiers de gestion des routes de l'application**************************************/
 
+const authRoutes = require('./routes/auth');
 const usersRoutes = require('./routes/users');
 const postsRoutes = require('./routes/posts');
 const commentsRoutes = require('./routes/comments');
@@ -34,7 +38,7 @@ app.use(limiter); //Utilisation de la règle créée
 /***************Connexion à la base MySQL avec utilisation de variables d'environnement pour sécuriser l'accès à la base***************/
 
 //Appel du fichier de configuration de dotenv 
-require('dotenv').config();
+require('dotenv').config({path: './config/.env'});
 
 const sequelize = new Sequelize(
     process.env.DB_NAME,
@@ -56,20 +60,36 @@ sequelize.authenticate()
 
 /**********************************************************Middlewares généraux********************************************************/
 
-app.use((req, res, next) => {//Middleware destiné à éviter les erreurs de CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    next();
-});
+//Middleware de gestion des erreurs de CORS
+const corsOptions = {
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+    'allowedHeaders': ['sessionId', 'Content-Type'],
+    'exposedHeaders': ['sessionId'],
+    'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    'preflightContinue': false
+};
+app.use(cors(corsOptions));
 
 app.use(helmet()); //Middleware permettant de sécuriser les en-têtes
 
+//Body-Parser
 app.use(bodyParser.urlencoded({ extended: true })); //Permet de parser dans les objets inclus dans d'autres
 app.use(bodyParser.json()); //Indique que l'on veut parser du JSON
 
+//Cookie-Parser
+app.use(cookieParser()); //Permet de lire et décoder les cookies
+
+//JSON Web Token
+app.get('*', checkAuth); //Appel du middleware de vérification de l'authentification de l'utilisateur
+app.get('/jwtid', requireAuth, (req, res) => {//Permet d'appeler le middleware de vérification de la présence d'un token dans le navigateur
+    res.status(200).json(res.locals.user.id);
+});
+
+//Routes
 app.use('/images', express.static(path.join(__dirname, 'images'))); //Gestion du routage de la ressource 'images' en statique
 
+app.use('/api/auth', authRoutes); //Utilisation du routeur auth pour toutes les demandes vers '/api/auth/'
 app.use('/api/users', usersRoutes); //Utilisation du routeur users pour toutes les demandes vers '/api/users/'
 app.use('/api/posts', postsRoutes); //Utilisation du routeur posts pour toutes les demandes vers '/api/posts/'
 app.use('/api/comments', commentsRoutes); //Utilisation du routeur comments pour toutes les demandes vers '/api/comments/'

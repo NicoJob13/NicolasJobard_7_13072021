@@ -1,4 +1,8 @@
-require('dotenv').config();
+/*------------------------------------------------------Fichier de configuration--------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------*/
+
+//Appel du fichier de configuration de dotenv 
+require('dotenv').config({path: './config/.env'});
 
 module.exports = {
   "development": {

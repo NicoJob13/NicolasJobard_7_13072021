@@ -1,13 +1,11 @@
-/*--------------------------------------------Les routes destinées à gérer les utilisateurs---------------------------------------------
+/*-------------------------------------------Les routes destinées à gérer l'authentification--------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------*/
-//Ces routes vont permettre à l'utilisateur d'afficher, modifier et supprimer son compte.
+//Ces routes vont permettre à l'utilisateur de créer son compte, de se connecter à l'application, et de se déconnecter.
 
 /***************************************Appel des packages, controllers et middlewares nécessaires**************************************/
 
 const express = require('express');
-const usersCtrl = require('../controllers/users'); //Les controllers liés à la gestion des utilisateurs (affichage, modification,
-                                                   //suppression de compte)
-const { checkAuth } = require('../middleware/auth');
+const authCtrl = require('../controllers/auth'); //Les controllers liés à l'authentification (inscription, connexion, déconnexion)
 
 /**********************************************************Création du routeur*********************************************************/
 
@@ -15,9 +13,9 @@ const router = express.Router();
 
 /************************************Les routes permettant d'appliquer la logique de fonctionnement************************************/
 
-router.get('/profile', checkAuth, usersCtrl.getMyProfile); //Affichage du profil d'un utilisateur
-router.put('/update', checkAuth, usersCtrl.updateMyProfile); //Modification d'un utilisateur
-router.delete('/delete', checkAuth, usersCtrl.deleteMyProfile); //Suppression d'un utilisateur
+router.post('/register', authCtrl.registerUser); //Inscription d'un utilisateur
+router.post('/login', authCtrl.loginUser); //Connexion d'un utilisateur
+router.get('/logout', authCtrl.logoutUser); //Déconnexion d'un utilisateur
 
 /****************************Export du router pour utilisation dans le fichier principal de l'application*****************************/
 
