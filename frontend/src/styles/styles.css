@@ -1,0 +1,58 @@
+.fa-sign-in-alt, .fa-sign-out-alt {
+    color: #fd2d01;
+}
+
+.logo {
+    max-height: 2rem;
+}
+
+.bg-red {
+    background-color: #ff9681;
+}
+
+.border-red {
+    border-color: #fd2d01 !important;
+}
+
+.form {
+    min-width: 305px;
+}
+
+@media screen and (min-width: 375px) {
+    .form {
+        min-width: 360px;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .form {
+        min-width: 640px;
+    }
+}
+
+.btn-validation {
+    color: #181a1b;
+    font-weight: bold;
+    background-color: #fd2d01;
+    border-color: #a11d03;
+}
+.btn-validation:hover {
+    box-shadow: 0 .01rem .2rem .01rem #181a1b;
+}
+
+.btn-active {
+    color: #181a1b;
+    font-weight: bold;
+    background-color: #fd2d01;
+    border-color: #a11d03;
+    box-shadow: 0 .01rem .2rem .01rem #181a1b;
+}
+
+.btn-inactive {
+    color: #181a1b;
+    background-color: #fff;
+    border-color: #a11d03;
+}
+.btn-inactive:hover {
+    box-shadow: 0 .01rem .2rem .01rem #181a1b;
+}
