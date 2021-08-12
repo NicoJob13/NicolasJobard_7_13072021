@@ -4,41 +4,29 @@
 /***********************************************Appel des packages et modèle nécessaires***********************************************/
 
 const bcrypt = require('bcrypt'); //Package de chiffrement pour le cryptage du mot de passe
-const jwt = require('../utils/jwt'); //Fichier contenant les outils de gestion de tokens d'identification
+//const jwt = require('../utils/jwt'); //Fichier contenant les outils de gestion de tokens d'identification
 const models = require('../models'); //Modèles dans la DB
 
 /***********************************************Controller d'affichage d'un utilisateur***********************************************/
 
-exports.getMyProfile = (req, res, next) => {
-    //Récupération des données de l'authorisation présent dans le header pour en extraire l'id de l'utilisateur connecté
-    const authData = req.headers['authorization'];
-    const uId = jwt.getUId(authData);
-    
+exports.getUser = (req, res, next) => {
     models.User.findOne({//On recherche l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
         attributes: [ 'id', 'firstname', 'lastname', 'email', 'role' ],
-        where: { id: uId }
+        where: { id: req.params.id }
     })
     .then(userFound => {
-        if(userFound) {//Si l'utilisateur est présent en base
-            res.status(200).json({ message: 'Utilisateur trouvé !', userFound }); //On retourne les informations de profil
-            next();
-        } else {//Si l'utilisateur n'existe pas
-            return res.status(500).json({ error: 'Impossible de récupérer l\'utilisateur !' }); //On retourne un statut d'erreur et un message
-        }
+        res.status(200).json(userFound); //On retourne les informations de profil
+        next();
     })
     .catch(error => res.status(404).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
 };
 
 /*********************************************Controller de modification d'un utilisateur**********************************************/
 
-exports.updateMyProfile = (req, res, next) => {
-    //Récupération des données de l'authorisation présent dans le header pour en extraire l'id
-    const authData = req.headers['authorization'];
-    const uId = jwt.getUId(authData);
-    
+exports.updateUser = (req, res, next) => {
     models.User.findOne({//On recherche de l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
         attributes: [ 'id', 'firstname', 'lastname', 'email', 'password', 'role', 'updatedAt' ],
-        where: { id: uId }
+        where: { id: req.params.id }
     })
     .then(userFound => {
         if(userFound) {//Si l'utilisateur est présent en base
@@ -74,7 +62,7 @@ exports.updateMyProfile = (req, res, next) => {
                             .then(() => {//On va rechercher à nouveau l'utilisateur...
                                 models.User.findOne({
                                     attributes: [ 'id', 'firstname', 'lastname', 'email', 'role', 'updatedAt' ],
-                                    where: { id: uId }
+                                    where: { id: req.params.id }
                                 })
                                 .then(updatedProfile => {//...pour en afficher les informations modifiées
                                     res.status(200).json({ message: 'Profil mis à jour !', updatedProfile });
@@ -100,14 +88,10 @@ exports.updateMyProfile = (req, res, next) => {
 
 /*********************************************Controller de suppression d'un utilisateur***********************************************/
 
-exports.deleteMyProfile = (req, res, next) => {
-    //Récupération des données de l'authorisation présent dans le header pour en extraire l'id
-    const authData = req.headers['authorization'];
-    const uId = jwt.getUId(authData);
-    
+exports.deleteUser = (req, res, next) => {
     models.User.findOne({//On recherche de l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
         attributes: [ 'id', 'password' ],
-        where: { id: uId }
+        where: { id: req.params.id }
     })
     .then(userFound => {
         if(userFound) {//Si l'utilisateur est présent en base

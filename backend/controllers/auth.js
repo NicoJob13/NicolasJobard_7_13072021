@@ -15,7 +15,7 @@ exports.registerUser = (req, res, next) => {
 
     //Vérification que toutes les paramètres nécessaires à la requête sont présents
     if(firstname == null || lastname == null || email == null || password == null || role == null) {//Si un des champs n'est pas renseigné
-        return res.status(400).json({ 'error': 'Informations manquantes'});
+        return res.status(400).json({ error: 'Informations manquantes'});
     }
     models.User.findOne({ //On recherche si l'adresse email est déjà présente dans la DB
         attributes: ['email'],
@@ -52,7 +52,7 @@ exports.registerUser = (req, res, next) => {
                 .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
             }
         } else {//Si l'utilisateur est trouvé
-            res.status(409).json({ 'error': 'Cet utilisateur existe déjà !'}); //On renvoie un statut d'erreur et un message
+            res.status(409).json({ error: 'Cet utilisateur existe déjà !' }); //On renvoie un statut d'erreur et un message
         }
     })
     .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
@@ -83,8 +83,9 @@ exports.loginUser = (req, res, next) => {
                         userId: userExist.id, //l'id de l'utilisateur
                         token: token
                     });
+                    next();
                 }
-                next();
+                
             })
             .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
         }
