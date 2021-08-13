@@ -1,3 +1,11 @@
+.logout:hover {
+    cursor: pointer;
+}
+
+.menu-active {
+    color: #fd2d01;
+}
+
 .fa-sign-in-alt, .fa-sign-out-alt {
     color: #fd2d01;
 }

@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import Auth from '../components/auth';
 import { UIdContext } from "../components/appcontext";
+import HandleProfile from '../components/profile/';
 
 const Profile = () => {
     const uId = useContext(UIdContext);
@@ -8,7 +9,7 @@ const Profile = () => {
     return (
         <div>
             {uId ? (
-                <h1>UPDATE PAGE</h1>
+                <HandleProfile display={true} update={false} delete={false}/>
             ) : (
                 <div>
                 <Auth register={true} login={false} />

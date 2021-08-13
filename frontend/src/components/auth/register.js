@@ -19,7 +19,7 @@ const Register = () => {
         await axios({
             method: 'post',
             url: `${process.env.REACT_APP_API_URL}/api/auth/register`,
-            //withCredentials: true,
+            withCredentials: true,
             data: {
                 firstname,
                 lastname,

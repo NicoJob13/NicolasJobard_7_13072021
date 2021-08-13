@@ -1,33 +1,11 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { UIdContext } from "./appcontext";
 import LogOut from './auth/logout';
-import axios from 'axios';
 
 const Navbar = () => {
+    //Récupération des informations sur l'utilisateur
     const uId = useContext(UIdContext);
-    const [userData, setUserData] = useState({});
-
-    useEffect(() => {
-        const getUserData = async () => {
-            await axios({
-                method: 'get',
-                url: `${process.env.REACT_APP_API_URL}/api/users/${uId}`,
-                withCredentials: true,
-            })
-            .then((res) => {
-                if(res.data.error) {
-                    console.log(res.data.error); 
-                } else {
-                    setUserData(res.data);
-                }
-            })
-            .catch((err) => {
-                console.log('Problème de récupération des données');
-            });
-        };
-        getUserData();
-    }, [uId]);
 
     return (
         <nav className='d-flex flex-column justify-content-center align-items-center my-0'>
@@ -43,7 +21,7 @@ const Navbar = () => {
                     <div className='d-flex flex-row justify-content-between align-items-center'>
                         <div>
                             <NavLink className='text-dark' exact to='/profile'>
-                                <div className='mt-3'>Bonjour {userData.firstname}</div>
+                                <div className='mt-3'><i className="fas fa-user-circle pe-2"></i>Profil</div>
                             </NavLink>
                         </div>
                         <div className='mt-3'>
@@ -54,7 +32,7 @@ const Navbar = () => {
                     <div>
                         <div className='d-flex flex-row justify-content-end'>
                             <NavLink exact to='/profile'>  
-                                <span><i className='fas fa-sign-in-alt'></i></span>
+                                <span className='btn'><i className='fas fa-sign-in-alt px-2'></i>Se connecter</span>
                             </NavLink>
                         </div>
                     </div>

@@ -22,9 +22,9 @@ const LogOut = () => {
     };
 
     return (
-        <div onClick={logOut}>
-            <i className="fas fa-sign-out-alt"></i>
-        </div>
+        <span className='logout' onClick={logOut}>
+            <i className="fas fa-sign-out-alt pe-2"></i>Quitter
+        </span>
     );
 };
 

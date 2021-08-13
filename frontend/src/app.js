@@ -18,7 +18,7 @@ const App = () => {
         withCredentials: true
       })
       .then((res) => {
-        setUId(res.data);
+        setUId(res.data.id);
       })
       .catch((err) => {
         console.log('Pas de token')
@@ -27,7 +27,7 @@ const App = () => {
     fetchToken();
 
   }, [uId]);
-
+  
   return (
     <UIdContext.Provider value={uId}>
       <div className='container-sm d-flex flex-column align-items-center'>
