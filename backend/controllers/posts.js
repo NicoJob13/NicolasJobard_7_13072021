@@ -9,7 +9,7 @@ const fs = require('fs'); //Package de gestion des fichiers
 
 /*************************************************Controllers d'affichage des posts***************************************************/
 
- exports.getAllPosts = (req, res, next) => {
+exports.getAllPosts = (req, res, next) => {
     models.Post.findAll({//Récupération de tous les posts avec les informations précisées dans 'attributes' et tri chronologique inverse
         order: [[ 'createdAt', 'DESC' ]]
     })
@@ -35,8 +35,8 @@ exports.createPost = (req, res, next) => {
         if(userFound) {//Si l'utilisateur est trouvé dans la base
             //Récupération des données saisies pour la création du post depuis le body
             const text = req.body.text;
-            const picture = req.file;
-            const pictureUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`; //Résolution de l'Url de l'image (protocole/hôte/dossier/nom du fichier)
+            //const picture = req.file;
+            //const pictureUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`; //Résolution de l'Url de l'image (protocole/hôte/dossier/nom du fichier)
             
             if(text != null || picture != null) {//Si des données sont renseignées
                 models.Post.create({//Création du post
@@ -44,7 +44,7 @@ exports.createPost = (req, res, next) => {
                     userName: userFound.firstname + ' ' + userFound.lastname,
                     userRole: userFound.role,
                     text: text,
-                    pictureUrl: pictureUrl
+                    pictureUrl: 'picture'
                 })
                 .then(createdPost => {//On va rechercher le post...
                     models.Post.findOne({
@@ -70,21 +70,45 @@ exports.createPost = (req, res, next) => {
 
 /**************************************************Controller de modification d'un post***********************************************/
 
-exports.modifyPost = (req, res, next) => {
+exports.updatePost = (req, res, next) => {
     //Récupération de l'id du post présent dans les paramètres de la requête
     const pId = req.params.id;
     
     models.Post.findOne({//On recherche le post à modifier en fonction de son id et on récupère les champs précisés dans 'attributes'
-        attributes: [ 'userId', 'text', 'pictureUrl', 'updatedAt' ],
+        attributes: [ 'UserId', 'text', /*'pictureUrl', 'updatedAt'*/ ],
         where: { id: pId }
     })
     .then(postFound => {
         if(postFound) {
-            //Récupération des données de l'authorisation présent dans le header pour en extraire l'id puis le role de cet utilisateur
-            const authData = req.headers['authorization'];
-            const uId = jwt.getUId(authData);
+            models.Post.update({//Mise à jour du post ciblé par son Id
+                //UserId : req.body.UserId,
+                text: req.body.text, //(text ? text : postFound.text),
+                //pictureUrl: pictureUrl,//(pictureUrl ? pictureUrl : postFound.pictureUrl),
+                //updatedAt: new Date()
+            },
+            { where: { id: pId } }
+            )
+            .then(() => {//On va rechercher à nouveau le post...
+                models.Post.findOne({
+                    attributes: [ 'id', 'text', /*'updatedAt'*/ ],
+                    where: { id: pId }
+                })
+                .then(updatedPost => {//...pour en afficher le texte modifié et la date de modification
+                    res.status(200).json(updatedPost);
+                    next();
+                })
+                .catch(error => res.status(404).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
+            })
+            .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur 
 
-            models.User.findOne({//On recherche l'utilisateur connecté par son id
+
+
+
+            //Récupération des données de l'authorisation présent dans le header pour en extraire l'id puis le role de cet utilisateur
+            //const authData = req.headers['authorization'];
+            //const uId = jwt.getUId(authData);
+
+            /*models.User.findOne({//On recherche l'utilisateur connecté par son id
                 attributes: [ 'role' ],
                 where: { id: uId }
             })
@@ -93,12 +117,12 @@ exports.modifyPost = (req, res, next) => {
                     //Récupération du rôle de l'utilisateur
                     const uRole = userFound.role;
                     
-                    if(uId === postFound.userId || uRole === 'Chargé(e) de communication') {//Si les identifiants utilisateur du post et connecté correspondent ou que l'utilisateur est modérateur
+                    if(uId === postFound.UserId || uRole === 'Chargé(e) de communication') {//Si les identifiants utilisateur du post et connecté correspondent ou que l'utilisateur est modérateur
                         //Recupération du texte saisi
                         const text = req.body.text;
-                        const pictureUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`; //Résolution de l'Url de l'image
+                        const pictureUrl = req.body.pictureUrl;//`${req.protocol}://${req.get('host')}/images/${req.file.filename}`; //Résolution de l'Url de l'image
                         
-                        if(pictureUrl != postFound.pictureUrl) {
+                        /*if(pictureUrl != postFound.pictureUrl) {
                             try {
                                 const filename = postFound.pictureUrl.split('/images')[1]; //Récupère le nom du fichier image à partir de son Url
                                 fs.unlink(`images/${filename}`); //Supprime l'image du dossier 'images' du serveur
@@ -109,7 +133,7 @@ exports.modifyPost = (req, res, next) => {
 
                         models.Post.update({//Mise à jour du post ciblé par son Id
                             text: (text ? text : postFound.text),
-                            pictureUrl: (pictureUrl ? pictureUrl : postFound.pictureUrl),
+                            pictureUrl: pictureUrl,//(pictureUrl ? pictureUrl : postFound.pictureUrl),
                             updatedAt: new Date()
                         },
                         { where: { id: pId } }
@@ -133,7 +157,7 @@ exports.modifyPost = (req, res, next) => {
                     return res.status(401).json({ error: 'Utilisateur non trouvé !' }); //On retourne un statut d'erreur et un message
                 }
             })
-            .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
+            .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur */
         } else {
             return res.status(401).json({ error: 'Post non trouvé !' }); //On retourne un staut d'erreur et un message
         }
@@ -153,7 +177,19 @@ exports.deletePost = (req, res, next) => {
     })
     .then(postFound => {
         if(postFound) {
-            //Récupération des données de l'authorisation présent dans le header pour en extraire l'id
+
+            models.Post.destroy({//Suppression du post ciblé par son Id
+                where: { id: pId }
+            })
+            .then(() => {//Si la commande fonctionne on retourne un message de réussite
+                res.status(200).json( {message: 'Post et commentaires supprimés !' } ); 
+                next();
+            })
+            .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
+
+
+
+        /*    //Récupération des données de l'authorisation présent dans le header pour en extraire l'id
             const authData = req.headers['authorization'];
             const uId = jwt.getUId(authData);
 
@@ -196,7 +232,9 @@ exports.deletePost = (req, res, next) => {
                     return res.status(400).json({ error: 'Utilisateur non trouvé !' }); //On retourne un statut d'erreur et un message
                 }
             })
-            .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
+            .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur */
+
+
         } else {
             return res.status(401).json({ error: 'Post non trouvé !' }); //On retourne un staut d'erreur et un message
         }
