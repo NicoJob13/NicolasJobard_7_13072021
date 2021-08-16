@@ -17,15 +17,15 @@ const LogOut = () => {
         })
         .then(() => deleteCookie('jwt'))
         .catch((err) => console.log(err));
-          
         window.location = '/';
     };
 
     return (
         <span className='logout' onClick={logOut}>
-            <i className="fas fa-sign-out-alt pe-2"></i>Quitter
+            <i className="fas fa-sign-out-alt pe-2"></i>
+            Quitter
         </span>
     );
 };
 
-export default LogOut
+export default LogOut;

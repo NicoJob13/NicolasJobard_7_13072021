@@ -2,13 +2,12 @@ import React, { useEffect, useState } from 'react';
 import Routes from './components/routes';
 import { UIdContext } from './components/appcontext';
 import axios from 'axios';
-
-import './styles/normalize.css';
-import './styles/bootstrap.css';
-import './styles/styles.css';
+import { useDispatch } from 'react-redux';
+import { getUser } from './actions/useractions';
 
 const App = () => {
-  const [uId, setUId] = useState(null);
+  const [uid, setUid] = useState(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -18,7 +17,8 @@ const App = () => {
         withCredentials: true
       })
       .then((res) => {
-        setUId(res.data.id);
+        const udata = res.data.user;
+        setUid(udata.id);
       })
       .catch((err) => {
         console.log('Pas de token')
@@ -26,10 +26,13 @@ const App = () => {
     };
     fetchToken();
 
-  }, [uId]);
-  
+    if(uid) {
+      dispatch(getUser(uid));
+    }
+  }, [uid, dispatch]);
+
   return (
-    <UIdContext.Provider value={uId}>
+    <UIdContext.Provider value={uid}>
       <div className='container-sm d-flex flex-column align-items-center'>
         <Routes />
       </div>

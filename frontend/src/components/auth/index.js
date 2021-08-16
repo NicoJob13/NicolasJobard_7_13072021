@@ -1,34 +1,35 @@
 import React, { useState } from 'react';
-import Register from './register';
-import LogIn from './login';
+import RegisterForm from './register';
+import LogInForm from './login';
 
 const Auth = ( props ) => {
-    const [registerForm, setRegisterForm] = useState(props.register);
-    const [logInForm, setLogInForm] = useState(props.login);
-
-    const handleForms = (e) => {
-        if(e.target.id === 'register') {
-            setLogInForm(false);
-            setRegisterForm(true);
-        } else if(e.target.id === 'login') {
-            setRegisterForm(false);
-            setLogInForm(true);
-        }
-    };
+    const [registerModal, setRegisterModal] = useState(props.register);
+    const [logInModal, setLogInModal] = useState(props.login);
     
     return (
         <div className='d-flex flex-column bg-red border border-2 rounded border-red mt-5'>
             <div className='d-flex flex-row justify-content-evenly mt-4 mb-4'>
-                <div className={registerForm ? 'btn btn-active' : 'btn btn-inactive'} id='register' onClick={handleForms}>
-                    Inscription
-                </div>
-                <div className={logInForm ? 'btn btn-active' : 'btn btn-inactive'} id='login' onClick={handleForms} >
-                    Connexion
-                </div>
+                {logInModal && (
+                    <div className='d-flex flex-column align-items-center'>
+                        <h3 className='text-center'>Pas encore des nôtres ? Rejoignez-nous !</h3>
+                        <button className='btn btn-register' id='register' onClick={(e) => {
+                            setRegisterModal(true);
+                            setLogInModal(false);
+                        }}>Inscription</button>
+                    </div>
+                )}
+                {registerModal && (
+                    <div className='d-flex flex-column align-items-center'>
+                        <button className='btn btn-register' id='register' onClick={(e) => {
+                            setRegisterModal(false);
+                            setLogInModal(true);
+                        }}>Connexion</button>
+                    </div>
+                )}
             </div>
             <div>
-                {registerForm && <Register />}
-                {logInForm && <LogIn />}
+                {registerModal && <RegisterForm />}
+                {logInModal && <LogInForm />}
             </div>
         </div>
     ); 
