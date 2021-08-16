@@ -20,11 +20,9 @@ exports.checkAuth = (req, res, next) => {
 
             if(!tokenUId) {//S'il n'y a pas de userId dans le token décodé
                 res.locals.user = null; //On passe locals.user à null
-                res.cookie("jwt", "", { maxAge: 1 }); //On supprime le cookie 'jwt'
                 throw 'Problème d\'authentification : identifiant utilisateur absent';
             } else {//S'il y a un userId dans le token décodé
                 models.User.findOne({//On recherche l'utilisateur en fonction de cet id et on récupère les champs précisés dans 'attributes'
-                    attributes: [ 'id' ],
                     where: { id: tokenUId }
                 })
                 .then(userExist => {
@@ -33,7 +31,8 @@ exports.checkAuth = (req, res, next) => {
                         next();
                     } else {//Si l'utilisateur n'existe pas dans la base
                         res.locals.user = null; //On passe locals.user à null
-                        throw 'Utilisateur inconnu';
+                        console.log('Utilisateur inconnu');
+                        next();
                     }
                 })
                 .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
@@ -43,7 +42,8 @@ exports.checkAuth = (req, res, next) => {
         }
     } else {//S'il n'y a pas de cookie 'jwt' avec un contenu
       res.locals.user = null; //On passe l'utilisateur local à null
-      throw 'Pas de token dans le navigateur';
+      console.log('Pas de token dans le navigateur ');
+      next();
     }
 };
 

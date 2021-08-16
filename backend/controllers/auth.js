@@ -47,9 +47,9 @@ exports.registerUser = (req, res, next) => {
                         res.status(201).json({ message: 'Nouvel utilisateur enregistré !' }); //Statut et message de réussite
                         next();
                     })
-                    .catch(error => res.status(500).json({ error }));
+                    .catch(error => res.status(500).json(error));
                 })
-                .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
+                .catch(error => res.status(500).json(error)); //En cas d'erreur on retourne un statut d'erreur et l'erreur
             }
         } else {//Si l'utilisateur est trouvé
             res.status(409).json({ error: 'Cet utilisateur existe déjà !' }); //On renvoie un statut d'erreur et un message
@@ -70,22 +70,21 @@ exports.loginUser = (req, res, next) => {
     })
     .then(userExist => {
         if(!userExist) {//Si aucune correspondance n'est trouvée
-            return res.status(401).json({ error: 'Email utilisateur inconnu' });
+            return res.status(401).json(error= 'Email inconnu');
         } else {//Si une correspondance est trouvée on va comparer les mots de passe saisi/enregistré dans la base
             bcrypt.compare(password, userExist.password)
             .then(passwordMatch => {
                 if(!passwordMatch) {//S'ils ne correspondent pas
-                    return res.status(401).json({ error: 'Mot de passe incorrect' }); //On renvoie un statut d'erreur et un message
+                    return res.status(401).json(error= 'Mot de passe incorrect'); //On renvoie un statut d'erreur et un message
                 } else {
                     const token = jwt.genToken(userExist); //Création d'un token d'authentification
                     res.cookie('jwt', token, { httpOnly: true, maxAge: 43200000 });
-                    res.status(200).json({ //S'ils correspondent la réponse contient :
+                    res.status(201).json({ //S'ils correspondent la réponse contient :
                         userId: userExist.id, //l'id de l'utilisateur
                         token: token
                     });
                     next();
                 }
-                
             })
             .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
         }

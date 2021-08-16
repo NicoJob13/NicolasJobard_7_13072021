@@ -14,7 +14,8 @@ const router = express.Router();
 
 /************************************Les routes permettant d'appliquer la logique de fonctionnement************************************/
 
-router.get('/:id', usersCtrl.getUser); //Affichage du profil d'un utilisateur
+router.get('/', usersCtrl.getUsers); //Affichage des utilisateurs
+router.get('/:id', usersCtrl.getUser); //Affichage d'un utilisateur
 router.put('/:id', usersCtrl.updateUser); //Modification d'un utilisateur
 router.delete('/:id', usersCtrl.deleteUser); //Suppression d'un utilisateur
 

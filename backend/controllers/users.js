@@ -7,32 +7,56 @@ const bcrypt = require('bcrypt'); //Package de chiffrement pour le cryptage du m
 //const jwt = require('../utils/jwt'); //Fichier contenant les outils de gestion de tokens d'identification
 const models = require('../models'); //Modèles dans la DB
 
-/***********************************************Controller d'affichage d'un utilisateur***********************************************/
+/***********************************************Controller d'affichage des utilisateurs************************************************/
+
+exports.getUsers = (req, res, next) => {
+    models.User.findAll()
+    .then(usersFound => {
+        res.status(200).json({ data: usersFound });
+    })
+    .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
+};
 
 exports.getUser = (req, res, next) => {
+    const uId = req.params.id;
+    
+    if(uId < 1) {
+        return res.status(400).json({ error: 'Problème de token'});
+    }
+
     models.User.findOne({//On recherche l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
-        attributes: [ 'id', 'firstname', 'lastname', 'email', 'role' ],
-        where: { id: req.params.id }
+        //attributes: [ 'id', 'firstname', 'lastname', 'email', 'role' ],
+        where: { id: uId }
     })
     .then(userFound => {
-        res.status(200).json(userFound); //On retourne les informations de profil
-        next();
+        if(userFound) {
+            res.status(200).json(userFound); //On retourne les informations de profil
+            next();
+        } else {
+            res.status(404).json({ error: 'Utilisateur non trouvé' });
+        }
     })
-    .catch(error => res.status(404).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
+    .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
 };
 
 /*********************************************Controller de modification d'un utilisateur**********************************************/
 
 exports.updateUser = (req, res, next) => {
+    const uId = req.params.id;
+
+    //Récupération des données de l'utilisateur présentes dans le body (soit remontées par la requête soit par nouvelle saisie)
+    const {firstname, lastname, email, role, password, controlPassword} = req.body;
+
+    //Expressions régulières à vérifier pour l'e-mail et le mot de passe
+    //const emailSchema = /^[A-z0-9._-]+[@][a-zA-Z0-9._-]+[.][A-z]{2,}$/; 
+    const passwordSchema = /^(?=.*?[0-9])(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[_!@#$£µ=§%^&*?-\\/\\]).{8,}$/;
+    
     models.User.findOne({//On recherche de l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
-        attributes: [ 'id', 'firstname', 'lastname', 'email', 'password', 'role', 'updatedAt' ],
-        where: { id: req.params.id }
+        attributes: [ 'id', 'password', 'updatedAt' ],
+        where: { id: uId }
     })
     .then(userFound => {
         if(userFound) {//Si l'utilisateur est présent en base
-            //Récupération des données de l'utilisateur présentes dans le body (soit remontées par la requête soit par nouvelle saisie)
-            const {firstname, lastname, email, role, password, controlPassword} = req.body;
-            
             //Récupération du mot de passe de l'utilisateur en base de données
             const referencePassword = userFound.password;
 
@@ -42,18 +66,12 @@ exports.updateUser = (req, res, next) => {
                 if(!passwordMatch) {//S'ils ne correspondent pas
                     return res.status(409).json({ error: 'Mot de passe incorrect !' });
                 } else {//S'ils correspondent
-                    //Expressions régulières à vérifier pour l'e-mail et le mot de passe
-                    const emailSchema = /^[A-z0-9._-]+[@][a-zA-Z0-9._-]+[.][A-z]{2,}$/; 
-                    const passwordSchema = /^(?=.*?[0-9])(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[_!@#$£µ=§%^&*?-\\/\\]).{8,}$/;
-
-                    if(email.match(emailSchema) && password.match(passwordSchema)) {//Si les saisies vérifient les expressions régulières
+                    if(!password.match(passwordSchema)) {
+                        res.status(400).json({ error: 'Mot de passe non conforme'});
+                    } else {//Si les saisies vérifient les expressions régulières
                         bcrypt.hash(password, 10) //Hash du mot de passe par bcrypt avec 10 passes
                         .then(hash => {
                             models.User.update({//Mise à jour de l'utilisateur cible par son Id
-                                firstname: (firstname ? firstname : userFound.firstname),
-                                lastname: (lastname ? lastname : userFound.lastname),
-                                email: (email ? email : userFound.email),
-                                role: (role ? role : userFound.role),
                                 password: hash,
                                 updatedAt: new Date()
                             }, { 
@@ -73,8 +91,6 @@ exports.updateUser = (req, res, next) => {
                             .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
                         })
                         .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
-                    } else {//Si une des saisies ne respecte pas l'expression régulière qui s'y rapporte on renvoie le statut de l'erreur et un message
-                        return res.status(401).json({ error: 'Le nouvel email/mot de passe ne correspond pas à un format valide !' });
                     }
                 }
             })
@@ -89,9 +105,11 @@ exports.updateUser = (req, res, next) => {
 /*********************************************Controller de suppression d'un utilisateur***********************************************/
 
 exports.deleteUser = (req, res, next) => {
+    const uId = req.params.id;
+    
     models.User.findOne({//On recherche de l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
         attributes: [ 'id', 'password' ],
-        where: { id: req.params.id }
+        where: { id: uId }
     })
     .then(userFound => {
         if(userFound) {//Si l'utilisateur est présent en base

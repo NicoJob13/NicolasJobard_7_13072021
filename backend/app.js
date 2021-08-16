@@ -83,14 +83,14 @@ app.use(cookieParser()); //Permet de lire et décoder les cookies
 //JSON Web Token
 app.get('*', checkAuth); //Appel du middleware de vérification de l'authentification de l'utilisateur
 app.get('/jwtid', requireAuth, (req, res) => {//Permet d'appeler le middleware de vérification de la présence d'un token dans le navigateur
-    res.status(200).json(res.locals.user);
+    res.status(200).json(res.locals);
 });
 
 //Routes
 app.use('/images', express.static(path.join(__dirname, 'images'))); //Gestion du routage de la ressource 'images' en statique
 
 app.use('/api/auth', authRoutes); //Utilisation du routeur auth pour toutes les demandes vers '/api/auth/'
-app.use('/api/users', checkAuth, usersRoutes); //Utilisation du routeur users pour toutes les demandes vers '/api/users/'
+app.use('/api/users', usersRoutes); //Utilisation du routeur users pour toutes les demandes vers '/api/users/'
 app.use('/api/posts', postsRoutes); //Utilisation du routeur posts pour toutes les demandes vers '/api/posts/'
 app.use('/api/comments', commentsRoutes); //Utilisation du routeur comments pour toutes les demandes vers '/api/comments/'
 
