@@ -97,12 +97,18 @@ exports.deletePost = (req, res, next) => {
     })
     .then(postFound => {
         if(postFound) {//Si le post est trouvé
-            models.Post.destroy({//On supprime le post ciblé par son Id
-                where: { id: pId }
+            models.Comment.destroy({//On supprime au préalable les commentaires du post ciblés par l'id du post, clé étrangère empêchant la suppression directe du post
+                where: { postId: pId }
             })
             .then(() => {//Si la commande fonctionne on retourne un message de réussite
-                res.status(200).json( {message: 'Post et commentaires supprimés !' } ); 
-                next();
+                models.Post.destroy({//On supprime le post ciblé par son Id
+                    where: { id: pId }
+                })
+                .then(() => {//Si la commande fonctionne on retourne un message de réussite
+                    res.status(200).json( {message: 'Post et commentaires supprimés !' } ); 
+                    next();
+                })
+                .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
             })
             .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
         } else {//Si le post n'est pas trouvé
