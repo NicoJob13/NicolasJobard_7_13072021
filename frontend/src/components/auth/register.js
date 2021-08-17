@@ -53,11 +53,11 @@ const RegisterForm = () => {
             <div className='col-10 mx-auto'>
                 <label className='fw-bold form-label' htmlFor='job'>Poste</label>
                 <select className='mb-3 form-select' id='job' name='job' value={job} onChange={(e) => setJob(e.target.value)} >
-                        <option value=''>Veuillez indiquer votre fonction</option>
-                        <option value='Développeur'>Développeur</option>
-                        <option value='Commercial'>Commercial</option>
-                        <option value='Technicien'>Technicien</option>
-                        <option value='Chargé(e) de communication'>Chargé(e) de communication</option>
+                    <option value=''>Veuillez indiquer votre fonction</option>
+                    <option value='Développeur'>Développeur</option>
+                    <option value='Commercial'>Commercial</option>
+                    <option value='Technicien'>Technicien</option>
+                    <option value='Chargé(e) de communication'>Chargé(e) de communication</option>
                 </select>
             </div>
             <div className='col-10 mx-auto'>
@@ -67,7 +67,6 @@ const RegisterForm = () => {
             </div>
             <input className='mt-3 mb-4 col-6 mx-auto btn btn-validation ' type='submit' value="S'inscrire" />
             <div type='button' className='text-success fw-bold text-center mb-3' id='textRegistration' onClick={reload}></div>
-
         </form>
     );
 };

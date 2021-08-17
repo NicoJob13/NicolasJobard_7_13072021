@@ -73,7 +73,6 @@ const Card = ({ post }) => {
                 </div>
             </div>
             </>)}
-            <div></div>
         </div>
     );
 };

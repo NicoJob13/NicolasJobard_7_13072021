@@ -26,7 +26,7 @@ const DeleteProfile = () => {
                         <input className='profile-data rounde mb-3 col-8 mx-auto form-control' id='controlPass' type='password' name='controlPass' value={controlPassword} onChange={(e) => setControlPassword(e.target.value)} />
                     </div>
                     <button className='mt-3 mb-4 col-4 mx-auto btn btn-validation' onClick={() => {
-                        if(window.confirm('Vous êtes sur le point de supprimer un commentaire. Confirmez-vous la suppression ?')) {
+                        if(window.confirm('Vous êtes sur le point de supprimer votre compte. Confirmez-vous la suppression ?')) {
                             handleDelete();
                         }
                     }}>Supprimer</button>
