@@ -11,18 +11,18 @@ require('dotenv').config({path: './config/.env'}); //Appel du fichier de configu
 /***************************************Middleware de vérification que l'utilisateur est connecté**************************************/
 
 exports.checkAuth = (req, res, next) => {
-    const jwtCookie = req.cookies.jwt; //Récupération du contenu du cookie 'jwt'
+    const jwtCookie = req.cookies.jwt; //On récupère le contenu du cookie 'jwt'
 
     if(jwtCookie && jwtCookie != null) {//S'il y a un cookie 'jwt' non null donc contenant un token
         try {
-            const decodedToken = jwt.verify(jwtCookie, process.env.SECRET_TOKEN); //Décodage du token avec jsonwebtoken
-            const tokenUId = decodedToken.userId; //Récupération du userId dans l'objet issu du décodage
+            const decodedToken = jwt.verify(jwtCookie, process.env.SECRET_TOKEN); //On décode le token
+            const tokenUId = decodedToken.userId; //On récupère userId dans l'objet issu du décodage
 
             if(!tokenUId) {//S'il n'y a pas de userId dans le token décodé
                 res.locals.user = null; //On passe locals.user à null
-                throw 'Problème d\'authentification : identifiant utilisateur absent';
+                console.log('Problème d\'authentification : identifiant introuvable');
             } else {//S'il y a un userId dans le token décodé
-                models.User.findOne({//On recherche l'utilisateur en fonction de cet id et on récupère les champs précisés dans 'attributes'
+                models.User.findOne({//On recherche l'utilisateur en fonction de cet id
                     where: { id: tokenUId }
                 })
                 .then(userExist => {
@@ -37,7 +37,7 @@ exports.checkAuth = (req, res, next) => {
                 })
                 .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
             }
-        } catch (error) {//En cas d'erreur on retourne un statut d'erreur + si on reçoit une erreur on la retourne, sinon on renvoie un message 'standard'
+        } catch (error) {//En cas d'erreur on retourne un statut d'erreur et un message
             res.status(401).json({ message: 'Problème avec le token' });
         }
     } else {//S'il n'y a pas de cookie 'jwt' avec un contenu
@@ -48,26 +48,25 @@ exports.checkAuth = (req, res, next) => {
 };
 
 /**********************************Middleware de vérification du token lors d'une requête de connexion*********************************/
-//Permet de voir si une personne qui arrive sur le site a déjà un token pour pouvoir le connecter automatiquement
 
 exports.requireAuth = (req, res, next) => {
-    const jwtCookie = req.cookies.jwt; //Récupération du contenu du cookie 'jwt'
+    const jwtCookie = req.cookies.jwt; //On récupère le contenu du cookie 'jwt'
 
-    if(jwtCookie && jwtCookie != null) {//S'il y a un cookie 'jwt' non null donc contenant un token
+    if(jwtCookie && jwtCookie != null) {//S'il y a un cookie 'jwt' contenant un token
         try {
-            const decodedToken = jwt.verify(jwtCookie, process.env.SECRET_TOKEN); //Décodage du token avec jsonwebtoken
-            const tokenUId = decodedToken.userId; //Récupération du userId dans l'objet issu du décodage
+            const decodedToken = jwt.verify(jwtCookie, process.env.SECRET_TOKEN); //On décode le token
+            const tokenUId = decodedToken.userId; //On récupère le userId dans l'objet issu du décodage
 
-            if(!tokenUId) {
-                throw 'Problème d\'authentification : identifiant introuvable';
-            } else {
-                console.log(tokenUId);
+            if(!tokenUId) {//S'il n'y a pas de UserId
+                console.log('Problème d\'authentification : identifiant introuvable'); //On retourne un message
+            } else {//Si un userId est trouvé
+                console.log(tokenUId); //On retourne sa valeur
                 next();
             }
-        } catch (error) {
+        } catch (error) {//En cas d'erreur on retourne un statut d'erreur et un message
             res.status(401).json({ message: 'Problème avec le token' });
         }
     } else {//S'il n'y a pas de cookie 'jwt avec un contenu
-        throw 'Pas de token dans le navigateur';
+        console.log('Pas de token dans le navigateur'); //On retourne un message
     }
 };

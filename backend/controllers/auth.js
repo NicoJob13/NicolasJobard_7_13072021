@@ -15,7 +15,7 @@ exports.registerUser = (req, res, next) => {
 
     //Vérification que toutes les paramètres nécessaires à la requête sont présents
     if(firstname == null || lastname == null || email == null || password == null || role == null) {//Si un des champs n'est pas renseigné
-        return res.status(400).json({ error: 'Informations manquantes'});
+        return res.status(400).json({ error: 'Informations manquantes'}); //On retourne un statut et un message d'erreur
     }
     models.User.findOne({ //On recherche si l'adresse email est déjà présente dans la DB
         attributes: ['email'],
@@ -27,13 +27,13 @@ exports.registerUser = (req, res, next) => {
             const emailSchema = /^[A-z0-9._-]+[@][a-zA-Z0-9._-]+[.][A-z]{2,}$/; 
             const passwordSchema = /^(?=.*?[0-9])(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[_!@#$£µ=§%^&*?-\\/\\]).{8,}$/;
 
-            if(!email.match(emailSchema) && !password.match(passwordSchema)) {
-                res.status(400).json({ error: 'Email et mots de passe non conformes'});
+            if(!email.match(emailSchema) && !password.match(passwordSchema)) {//Si les expressions régulières ne sont pas respectées
+                res.status(400).json({ error: 'Email et mots de passe non conformes'}); //On retourne des statuts et messages d'erreur
             } else if(!email.match(emailSchema)) {
                 res.status(400).json({ error: 'Email non conforme'});
             } else if(!password.match(passwordSchema)) {
                 res.status(400).json({ error: 'Mot de passe non conforme'});
-            } else {
+            } else {//Si les expressions régulières sont respectées
                 bcrypt.hash(password, 10) //Hash du mot de passe par bcrypt avec 10 passes
                 .then(hash => {//En cas de réussite du hash
                     models.User.create({ //On crée l'utilisateur
@@ -44,7 +44,7 @@ exports.registerUser = (req, res, next) => {
                         role: role
                     })
                     .then(newUser => {
-                        res.status(201).json({ message: 'Nouvel utilisateur enregistré !' }); //Statut et message de réussite
+                        res.status(201).json({ message: 'Nouvel utilisateur enregistré !' }); //On retourn un statut et un message de réussite
                         next();
                     })
                     .catch(error => res.status(500).json(error));
@@ -61,18 +61,18 @@ exports.registerUser = (req, res, next) => {
 /***********************************************Controller de connexion d'un utilisateur***********************************************/
 
 exports.loginUser = (req, res, next) => {
-    //Récupération des information saisies dans les champs de formulaire
+    //On récupère les information saisies dans les champs de formulaire
     const {email, password} = req.body;
  
-    //Recherche de l'utilisateur dans la base par correspondance des adresses saisie/enregistrée dans la base
+    //On recherche l'utilisateur dans la base par correspondance des adresses saisie/enregistrée dans la base
     models.User.findOne({//On recherche si l'adresse email est déjà présente dans la DB
         where: { email: email }
     })
     .then(userExist => {
         if(!userExist) {//Si aucune correspondance n'est trouvée
-            return res.status(401).json(error= 'Email inconnu');
-        } else {//Si une correspondance est trouvée on va comparer les mots de passe saisi/enregistré dans la base
-            bcrypt.compare(password, userExist.password)
+            return res.status(401).json(error= 'Email inconnu'); //On renvoie un statut d'erreur et un message
+        } else {//Si une correspondance est trouvée
+            bcrypt.compare(password, userExist.password) //On compare les mots de passe
             .then(passwordMatch => {
                 if(!passwordMatch) {//S'ils ne correspondent pas
                     return res.status(401).json(error= 'Mot de passe incorrect'); //On renvoie un statut d'erreur et un message
@@ -81,7 +81,7 @@ exports.loginUser = (req, res, next) => {
                     res.cookie('jwt', token, { httpOnly: true, maxAge: 43200000 });
                     res.status(201).json({ //S'ils correspondent la réponse contient :
                         userId: userExist.id, //l'id de l'utilisateur
-                        token: token
+                        token: token //le token
                     });
                     next();
                 }
