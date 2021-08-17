@@ -151,7 +151,6 @@ exports.deletePost = (req, res, next) => {
     const pId = req.params.id;
 
     models.Post.findOne({//On recherche le post à supprimer en fonction de son id et on récupère les champs précisés dans 'attributes'
-        attributes: [ 'userId', 'pictureUrl' ],
         where: { id: pId }
     })
     .then(postFound => {
