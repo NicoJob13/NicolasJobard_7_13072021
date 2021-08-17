@@ -72,7 +72,7 @@ exports.updatePost = (req, res, next) => {
                 models.Post.findOne({
                     where: { id: pId }
                 })
-                .then(updatedPost => {//...pour en afficher le texte modifié et la date de modification
+                .then(updatedPost => {//...pour en afficher le texte modifié
                     res.status(200).json(updatedPost);
                     next();
                 })
