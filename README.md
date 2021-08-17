@@ -16,7 +16,7 @@ Créez un réseau social d’entreprise.
 * Profil sommaire;
 * Création de compte réalisable par mobile;
 * Possibilité de suppression du compte;
-* Publication de contenus multimédias et textes;
+* Publication de contenus multimédias ou textes;
 * Mise en évidence des dernières publications;
 * Possibilité de modération. 
 ### Contraintes techniques
@@ -33,3 +33,27 @@ Créez un réseau social d’entreprise.
 * Libre choix du design de l'interface utilisateur.
 ## Livrables
 * Le lien vers un dépôt Git public contenant le code de l'application.
+## Comment utiliser ce dépôt
+* S'assurer au préalable de disposer de node.js sur le poste, sinon le télécharger (https://nodejs.org/) puis l'installer;
+### Partie Backend
+* Créer une base de données MySQL vide; 
+* Ouvrir le dossier 'backend' du projet dans son IDE;
+* Ouvrir un terminal et suivre les étapes d'installation suivantes :
+    * npm install (qui installe les dépendances du projet),
+    * créer un fichier '.env' dans le dossier 'config' afin d'y renseigner les variables d'environnement suivantes :
+        * DB_NAME=le nom de votre base de données
+        * DB_USER=votre nom d'utilisateur
+        * DB_PASS=votre mot de passe
+        * DB_HOST=localhost
+        * DIALECT=mysql
+        * SECRET_TOKEN=9UYxK7Lt7Np86mUqS2gS
+        * PORT=5000
+        * CLIENT_URL=http://localhost:3000
+* Exécuter 'nodemon server' ou 'npm start' : le message 'Listening on port 5000' doit apparaître;
+* Dans un terminal exécuter la commande : npx sequelize-cli db:migrate. Cela crééra les tables de la base.
+### Partie Frontend
+* Ouvrir le dossier 'frontend' dans son IDE;
+* Ouvrir un terminal et suivre les étapes d'installation suivantes :
+    * npm install (qui installe les dépendances du projet);
+* Exécuter 'npm start'
+* Une fois la compilation effectuée, vous serez automatiquement redirigé vers 'http://localhost:3000/'.
