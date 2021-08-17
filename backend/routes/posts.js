@@ -6,7 +6,6 @@
 
 const express = require('express');
 const postsCtrl = require('../controllers/posts'); //Les controllers d'affichage, création, modification, suppression des posts
-const multer = require('../middleware/multer-config'); //Middleware de configuration du package de gestion des fichiers image
 
 /**********************************************************Création du routeur*********************************************************/
 
@@ -15,7 +14,7 @@ const router = express.Router();
 /************************************Les routes permettant d'appliquer la logique de fonctionnement************************************/
 
 router.get('/', postsCtrl.getAllPosts); //Affichage de tous les posts
-router.post('/', multer, postsCtrl.createPost); //Création d'un post
+router.post('/', postsCtrl.createPost); //Création d'un post
 router.put('/:id', postsCtrl.updatePost); //Modification d'un post
 router.delete('/:id', postsCtrl.deletePost); //Suppression d'un post
 

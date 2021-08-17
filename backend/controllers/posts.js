@@ -5,7 +5,6 @@
 
 const models = require('../models'); //Modèles dans la DB
 const jwt = require('../utils/jwt'); //Fichier contenant les outils de gestion de tokens d'identification
-const fs = require('fs'); //Package de gestion des fichiers
 
 /*************************************************Controllers d'affichage des posts***************************************************/
 
@@ -23,39 +22,26 @@ exports.getAllPosts = (req, res, next) => {
 /***************************************************Controller de création d'un post**************************************************/
 
 exports.createPost = (req, res, next) => {
-    //Récupération des données de l'authorisation présente dans le header pour en extraire l'id de l'utilisateur connecté
-    const authData = req.headers['authorization'];
-    const uId = jwt.getUId(authData);
     
     models.User.findOne({//On recherche l'utilisateur en fonction de son id et on récupère les champs précisés dans 'attributes'
         attributes: [ 'id', 'firstname', 'lastname', 'role' ],
-        where: { id: uId }
+        where: { id: req.body.UserId }
     })
     .then(userFound => {
         if(userFound) {//Si l'utilisateur est trouvé dans la base
             //Récupération des données saisies pour la création du post depuis le body
             const text = req.body.text;
-            //const picture = req.file;
-            //const pictureUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`; //Résolution de l'Url de l'image (protocole/hôte/dossier/nom du fichier)
             
-            if(text != null || picture != null) {//Si des données sont renseignées
+            if(text != null) {//Si des données sont renseignées
                 models.Post.create({//Création du post
                     UserId: userFound.id,
                     userName: userFound.firstname + ' ' + userFound.lastname,
                     userRole: userFound.role,
                     text: text,
-                    pictureUrl: 'picture'
                 })
-                .then(createdPost => {//On va rechercher le post...
-                    models.Post.findOne({
-                        attributes: [ 'id', 'userId', 'userName', 'userRole', 'text', 'picture', 'createdAt' ],
-                        where: { id: createdPost.id }
-                    })
-                    .then(newPost => {//...pour en afficher les données
-                        res.status(200).json( { message: 'Nouveau post enregistré !', newPost: newPost } ); //Retourne l'objet
-                        next();
-                    })
-                    .catch(error => res.status(404).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
+                .then(createdPost => {
+                    res.status(200).json(createdPost); //Retourne l'objet
+                    next();
                 })
                 .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur
             } else {//Si aucune information nécessaire à la création du post n'est présente
@@ -75,7 +61,7 @@ exports.updatePost = (req, res, next) => {
     const pId = req.params.id;
     
     models.Post.findOne({//On recherche le post à modifier en fonction de son id et on récupère les champs précisés dans 'attributes'
-        attributes: [ 'UserId', 'text', /*'pictureUrl', 'updatedAt'*/ ],
+        attributes: [ 'UserId', 'text', 'updatedAt'],
         where: { id: pId }
     })
     .then(postFound => {
@@ -83,14 +69,13 @@ exports.updatePost = (req, res, next) => {
             models.Post.update({//Mise à jour du post ciblé par son Id
                 //UserId : req.body.UserId,
                 text: req.body.text, //(text ? text : postFound.text),
-                //pictureUrl: pictureUrl,//(pictureUrl ? pictureUrl : postFound.pictureUrl),
                 //updatedAt: new Date()
             },
             { where: { id: pId } }
             )
             .then(() => {//On va rechercher à nouveau le post...
                 models.Post.findOne({
-                    attributes: [ 'id', 'text', /*'updatedAt'*/ ],
+                    //attributes: [ 'id', 'text', /*'updatedAt'*/ ],
                     where: { id: pId }
                 })
                 .then(updatedPost => {//...pour en afficher le texte modifié et la date de modification
@@ -101,12 +86,6 @@ exports.updatePost = (req, res, next) => {
             })
             .catch(error => res.status(500).json({ error })); //En cas d'erreur on retourne un statut d'erreur et l'erreur 
 
-
-
-
-            //Récupération des données de l'authorisation présent dans le header pour en extraire l'id puis le role de cet utilisateur
-            //const authData = req.headers['authorization'];
-            //const uId = jwt.getUId(authData);
 
             /*models.User.findOne({//On recherche l'utilisateur connecté par son id
                 attributes: [ 'role' ],
@@ -189,9 +168,7 @@ exports.deletePost = (req, res, next) => {
 
 
 
-        /*    //Récupération des données de l'authorisation présent dans le header pour en extraire l'id
-            const authData = req.headers['authorization'];
-            const uId = jwt.getUId(authData);
+        /* 
 
             models.User.findOne({//On recherche l'utilisateur connecté par son id
                 attributes: [ 'role' ],
