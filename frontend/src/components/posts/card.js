@@ -51,8 +51,7 @@ const Card = ({ post }) => {
                         </div>
                     </div>
                 )}
-                <div>{post.pictureUrl}</div>
-                {userData.id === post.UserId && (
+                {(userData.id === post.UserId || userData.role === 'Chargé(e) de communication') && (
                 <>
                     <div>
                         <div onClick={() => setIsUpdated(true)}><i className="far fa-edit"></i></div>
