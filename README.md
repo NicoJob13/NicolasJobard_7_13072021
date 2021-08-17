@@ -49,7 +49,7 @@ Créez un réseau social d’entreprise.
         * SECRET_TOKEN=9UYxK7Lt7Np86mUqS2gS
         * PORT=5000
         * CLIENT_URL=http://localhost:3000
-* Exécuter 'nodemon server' ou 'npm start' : le message 'Listening on port 5000' doit apparaître;
+* Exécuter 'nodemon server' ou 'npm start' : les message 'Listening on port 5000' et 'Connexion à la base de données MySQL réussie !' doivent apparaître;
 * Dans un terminal exécuter la commande : npx sequelize-cli db:migrate. Cela crééra les tables de la base.
 ### Partie Frontend
 * Ouvrir le dossier 'frontend' dans son IDE;
