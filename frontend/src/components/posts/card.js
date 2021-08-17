@@ -44,9 +44,10 @@ const Card = ({ post }) => {
                 {isUpdated === false && <div>{post.text}</div>}
                 {isUpdated && (
                     <div>
-                        <textarea defaultValue={post.text} onChange={(e) => setTextUpdate(e.target.value)} />
+                        <textarea className='form-control' defaultValue={post.text} onChange={(e) => setTextUpdate(e.target.value)} />
                         <div>
-                            <button><i className="far fa-check-circle text-success" onClick={updateCard}></i></button>
+                            <button onClick={updateCard}>Valider</button>
+                            <button onClick={() => setIsUpdated(false)}>Annuler</button>
                         </div>
                     </div>
                 )}

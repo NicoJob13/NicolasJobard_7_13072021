@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { UIdContext } from "../components/appcontext";
 import Auth from '../components/auth';
+import NewPost from '../components/posts/newpost';
 import Thread from '../components/thread';
 
 const Home = () => {
@@ -17,8 +18,11 @@ const Home = () => {
       )}
       {uId && (
         <>
+        <div>
+          <NewPost />
+        </div>
         <div className=''>
-            <Thread />
+          <Thread />
         </div>
         </>
       )}
