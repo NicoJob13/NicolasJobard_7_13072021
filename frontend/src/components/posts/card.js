@@ -56,7 +56,7 @@ const Card = ({ post }) => {
     const sendCom = async (e) => {
         e.preventDefault();
 
-        if(message !== null) {
+        if(message) {
             await axios({
                 method: 'post',
                 url: `${process.env.REACT_APP_API_URL}/api/comments`,
@@ -68,7 +68,8 @@ const Card = ({ post }) => {
                 },
             })
             .then((res) => {
-                cancelCom();
+                setMessage('');
+            }).then(() => {
                 getComments();
             })
             .catch((err) => console.log(err));

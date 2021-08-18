@@ -17,7 +17,7 @@ const NewPost = () => {
     const sendPost = async (e) => {
         e.preventDefault();
 
-        if(text !== null) {
+        if(text) {
             await axios({
                 method: 'post',
                 url: `${process.env.REACT_APP_API_URL}/api/posts`,
@@ -28,8 +28,8 @@ const NewPost = () => {
                 },
             })
             .then((res) => {
+                setText('');
                 dispatch(getPosts());
-                cancelPost();
             })
             .catch((err) => console.log(err));
         } else {
