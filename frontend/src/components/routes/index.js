@@ -2,17 +2,19 @@ import React from 'react';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import Home from '../../pages/home';
 import Profile from '../../pages/profile';
-import Navbar from '../navbar';
+import Header from '../header';
+import Footer from '../footer';
 
 const Routes = () => {
     return (
         <Router>
-            <Navbar />
+            <Header />
             <Switch>
                 <Route path='/' exact component={Home} />
                 <Route path='/profile' exact component={Profile} />
                 <Redirect to='/' />
             </Switch>
+            <Footer />
         </Router>
     );
 };

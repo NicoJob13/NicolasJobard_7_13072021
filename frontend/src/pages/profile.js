@@ -3,7 +3,7 @@ import HandleProfile from '../components/profile/';
 
 const Profile = () => {
     return (
-        <div>
+        <div className='py-5 mb-5'>
             <HandleProfile />
         </div>
     );

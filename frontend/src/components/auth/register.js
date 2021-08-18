@@ -47,7 +47,7 @@ const RegisterForm = () => {
             </div>
             <div className='col-10 mx-auto'>
                 <label className='fw-bold form-label' htmlFor='email'>Email</label>
-                <input className='mb-3 form-control' id='email' type='text' name='email' value={email} onChange={(e) => setEmail(e.target.value)} />
+                <input className='mb-3 form-control' id='email' type='text' name='email' pattern="[a-z0-9.-_]+[@]{1}[a-z0-9.-_]+[.]{1}[a-z]{2,10}" title="Votre adresse email respectant le format 'exemple@mail.com'" value={email} onChange={(e) => setEmail(e.target.value)} />
                 <div id='emailError'></div>
             </div>
             <div className='col-10 mx-auto'>
@@ -62,7 +62,7 @@ const RegisterForm = () => {
             </div>
             <div className='col-10 mx-auto'>
                 <label className='fw-bold form-label' htmlFor='password'>Mot de passe</label>
-                <input className='mb-3 col-8 mx-auto form-control' id='password' type='password' name='password' value={password} onChange={(e) => setPassword(e.target.value)} />
+                <input className='mb-3 col-8 mx-auto form-control' id='password' type='password' name='password' pattern="(?=.*?[0-9])(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[_!@#$£µ=§%^*?-/&]).{8,}" placeholder="Minimum 8 caractères, 1 Majuscule, 1 minuscule, 1 chiffre, 1 symbole" value={password} onChange={(e) => setPassword(e.target.value)} />
                 <div id='passwordError'></div>
             </div>
             <input className='mt-3 mb-4 col-6 mx-auto btn btn-validation ' type='submit' value="S'inscrire" />

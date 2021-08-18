@@ -7,8 +7,8 @@ const HandleProfile = () => {
     const userData = useSelector((state => state.userReducer));
 
     return (
-        <div>
-            <h1 className='mt-4 text-center'>Bienvenue {userData.firstname} !</h1>
+        <div className='mt-3 pt-5'>
+            <h1 className='text-center'>Bienvenue {userData.firstname} !</h1>
             <div>
                 <UpdateProfile />
             </div>

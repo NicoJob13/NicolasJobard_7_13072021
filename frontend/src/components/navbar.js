@@ -8,7 +8,7 @@ const Navbar = () => {
     const uId = useContext(UIdContext);
 
     return (
-        <nav className='container px-3 py-3 border-bottom border-red d-flex flex-column justify-content-center align-items-center my-0'>
+        <nav className='container d-flex flex-column justify-content-center align-items-center'>
             <div className='container'>
                 <div className='d-flex justify-content-center'>
                     <NavLink exact to='/'>
@@ -21,10 +21,10 @@ const Navbar = () => {
                     <div className='d-flex flex-row justify-content-between align-items-center'>
                         <div>
                             <NavLink className='text-dark' exact to='/profile'>
-                                <div className='mt-3'><i className="fas fa-user-circle pe-2"></i>Profil</div>
+                                <div className='mt-1'><i className="fas fa-user-circle pe-2"></i>Profil</div>
                             </NavLink>
                         </div>
-                        <div className='mt-3'>
+                        <div className='mt-1'>
                             <LogOut />
                         </div>
                     </div>

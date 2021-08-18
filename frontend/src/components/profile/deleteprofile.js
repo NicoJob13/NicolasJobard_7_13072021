@@ -16,7 +16,7 @@ const DeleteProfile = () => {
 
     return (
         <div className='mt-4 mb-3'>
-            <div className='d-flex flex-column bg-red border border-2 rounded border-red mt-5'>
+            <div className='form d-flex flex-column bg-red mt-4'>
                 <h2 className='text-center mt-3'>Supprimer mon profil</h2>
                 <div className='d-flex flex-column align-items-center mt-4 mb-4'>
                     <h3 className='mb-4'>Vous souhaitez vraiment quitter Groupomania Connect ?</h3>

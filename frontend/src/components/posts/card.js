@@ -10,12 +10,13 @@ const Card = ({ post }) => {
     const [textUpdate, setTextUpdate] = useState(null);
     const [showComments, setShowComments] = useState(false);
     const [comments, setComments] = useState([]);
-    const [message, setMessage] = useState('');
+    const [message, setMessage] = useState(null);
     const [comIsUpdated, setComIsUpdated] = useState(false);
     const [comUpdate, setComUpdate] = useState(null);
     const usersData = useSelector((state) => state.usersReducer);
     const userData = useSelector((state) => state.userReducer);
     const dispatch = useDispatch();
+    const pid = post.id;
 
     //Gestion de la card
     const updateCard = () => {
@@ -46,7 +47,9 @@ const Card = ({ post }) => {
         });
     };
 
-    const cancelCom = () => {
+    const cancelCom = (e) => {
+        e.preventDefault();
+
         setMessage('');
     };
 
@@ -109,39 +112,41 @@ const Card = ({ post }) => {
     }, [usersData]);
 
     return (
-        <div className='card-container d-flex flex-column mt-5 border border-2 border-red rounded' key={post.id}>
+        <div className='post-card mt-3 bg-red' key={post.id}>
             {isLoading ? (
                 <i className="fas fa-spinner fa-spin"></i>
             ) : (
             <>
-            <div className='card-header d-flex flex-row justify-content-between'>
-                <h3 className='fs-4'>{post.userName}</h3>
-                <div className='pt-1'>{dateParser(post.createdAt)}</div>
+            <div className='d-flex flex-row justify-content-between px-2 pt-1'>
+                <h4 className='fs-6 me-0'>{post.userName}</h4>
+                <div className='date'>{dateParser(post.createdAt)}</div>
             </div>
-            <div className='card-body'>
-                {isUpdated === false && <div>{post.text}</div>}
+            <div className='text-body d-flex flex-row justify-content-between mx-auto mb-2'>
+                {isUpdated === false && <div className='px-2 align-self-center'>{post.text}</div>}
                 {isUpdated && (
                     <div>
-                        <textarea className='form-control' defaultValue={post.text} onChange={(e) => setTextUpdate(e.target.value)} />
-                        <div>
-                            <button onClick={updateCard}>Valider</button>
-                            <button onClick={() => setIsUpdated(false)}>Annuler</button>
+                        <textarea className='post-area-edit form-control ps-1 ms-1 mt-1' defaultValue={post.text} onChange={(e) => setTextUpdate(e.target.value)} />
+                        <div className='d-flex flex-row justify-content-center my-1'>
+                            <button className='btn btn-post ms-5 me-1' onClick={updateCard}>Valider</button>
+                            <button className='btn btn-post mx-1' onClick={() => setIsUpdated(false)}>Annuler</button>
                         </div>
                     </div>
                 )}
                 {(userData.id === post.UserId || userData.role === 'Chargé(e) de communication') && (
                 <>
+                <div>    
                     <div>
-                        <div onClick={() => setIsUpdated(true)}><i className="far fa-edit"></i></div>
+                        <div className='update-btn px-1' onClick={() => setIsUpdated(true)}><i className="far fa-edit"></i></div>
                     </div>
                     <div>
-                        <div onClick={() => {
+                        <div className='delete-btn px-1' onClick={() => {
                             if(window.confirm('Vous êtes sur le point de supprimer une publication. Confirmez-vous la suppression ?')) {
                                 deleteCard();
                             }
                         }}><i className="far fa-trash-alt"></i>
                         </div>
                     </div>
+                </div>
                 </>
                 )}
             </div>
@@ -150,39 +155,41 @@ const Card = ({ post }) => {
                     setShowComments(!showComments);
                     getComments();
                 }}>
-                <i className='far fa-comment-dots'><span className='ms-1'>Afficher/Masquer les commentaires</span></i>
+                <span className='ms-1 com-toggle'><i className='far fa-comment-dots me-2 mb-3'></i>Afficher/Masquer</span>
                 </div>
                 {showComments && (
                     <div>
                         {comments.map(comment => (
-                            <div className='border border-1 border-dark' key={comment.id}>
-                                <div>
-                                    <h4>{comment.userName}</h4>
-                                    <div className='pt-1'>{dateParser(comment.createdAt)}</div>
+                            <div className='container-sm text-body mb-3' key={comment.id}>
+                                <div className='d-flex flex-row justify-content-between pt-1'>
+                                    <h4 className='fs-6 me-0'>{comment.userName}</h4>
+                                    <div className='date-com'>{dateParser(comment.createdAt)}</div>
                                 </div>
-                                <div>{comment.text}</div>
-                                <div>
+                                <div className='container-sm text-body d-flex flex-row justify-content-between mb-2'>
+                                    {comIsUpdated === false && <div className='align-self-center'>{comment.text}</div>}
                                     {(userData.id === comment.UserId || userData.role === 'Chargé(e) de communication') && (comIsUpdated === false) && (
                                     <>
+                                    <div>
                                         <div>
-                                            <div onClick={() => setComIsUpdated(true)}><i className="far fa-edit"></i></div>
+                                            <div className='update-btn' onClick={() => setComIsUpdated(true)}><i className="far fa-edit"></i></div>
                                         </div>
                                         <div>
-                                            <div onClick={() => {
+                                            <div className='delete-btn' onClick={() => {
                                                 if(window.confirm('Vous êtes sur le point de supprimer un commentaire. Confirmez-vous la suppression ?')) {
                                                     deleteCom(comment.id);
                                                 }
                                             }}><i className="far fa-trash-alt"></i>
                                             </div>
                                         </div>
+                                    </div>
                                     </>
                                     )}
                                     {(userData.id === comment.UserId || userData.role === 'Chargé(e) de communication') && comIsUpdated && (
-                                        <div>
-                                            <input type='text' className='form-control' defaultValue={comment.text} onChange={(e) => setComUpdate(e.target.value)} />
-                                            <div>
-                                                <button onClick={() => updateCom(comment.id)}>Valider</button>
-                                                <button onClick={() => setComIsUpdated(false)}>Annuler</button>
+                                        <div >
+                                            <input className='com-input-edit mt-1 form-control' type='text'  defaultValue={comment.text} onChange={(e) => setComUpdate(e.target.value)} />
+                                            <div className='d-flex flex-row justify-content-center my-1'>
+                                                <button className='btn btn-post mx-1' onClick={() => updateCom(comment.id)}>Valider</button>
+                                                <button className='btn btn-post mx-1' onClick={() => setComIsUpdated(false)}>Annuler</button>
                                             </div>
                                         </div>
                                     )}
@@ -191,14 +198,16 @@ const Card = ({ post }) => {
                         ))}
                     </div>
                 )}
-                <form className='' id='postForm' action='' onSubmit={sendCom}>
-                    <div>
-                        <label className='fw-bold form-label' htmlFor='commentaire'>Nouveau message</label>
-                        <textarea className='form-control' name='commentaire' id='commentaire' placeholder='Laissez un commentaire' value={message} onChange={(e) => setMessage(e.target.value)}/>
-                        <input className='' type='submit' value="Envoyer" />
+                <form id='postForm' action='' onSubmit={sendCom}>
+                    <div className='d-flex flex-column'>
+                        <label className='form-label align-self-center' htmlFor={'com' + pid} >Réagir à la publication</label>
+                        <input className='text-area-post form-control mt-1 mb-2' type='text' name={'com' + pid} id={'com' + pid} placeholder='Laissez un commentaire' value={message} onChange={(e) => setMessage(e.target.value)}/>
+                    </div>
+                    <div className='d-flex flex-row justify-content-center'>
+                        <button className='btn btn-post mx-1' onClick={cancelCom}>Annuler</button>
+                        <button className='btn btn-post mx-1' type='submit'>Envoyer</button>
                     </div>
                 </form>
-                <button className="" onClick={cancelCom}>Annuler</button>
             </div>
             </>)}
         </div>

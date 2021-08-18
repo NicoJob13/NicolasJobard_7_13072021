@@ -7,7 +7,7 @@ const Auth = ( props ) => {
     const [logInModal, setLogInModal] = useState(props.login);
     
     return (
-        <div className='d-flex flex-column bg-red border border-2 rounded border-red mt-5'>
+        <div className='form d-flex flex-column bg-red mt-5'>
             <div className='d-flex flex-row justify-content-evenly mt-4 mb-4'>
                 {logInModal && (
                     <div className='d-flex flex-column align-items-center'>

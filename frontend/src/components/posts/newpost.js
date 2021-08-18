@@ -4,11 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { getPosts } from '../../actions/postsactions'
 
 const NewPost = () => {
-    const [text, setText] = useState('');
+    const [text, setText] = useState(null);
     const userData = useSelector((state) => state.userReducer);
     const dispatch = useDispatch();
 
-    const cancelPost = () => {
+    const cancelPost = (e) => {
+        e.preventDefault();
+        
         setText('');
     };
 
@@ -36,15 +38,17 @@ const NewPost = () => {
     };
 
     return (
-        <div className='d-flex flex-column mt-3 border border-2 border-red rounded'>
-            <form className='' id='postForm' action='' onSubmit={sendPost}>
-                <div>
-                    <label className='fw-bold form-label' htmlFor='message'>Nouveau message</label>
-                    <textarea className='form-control' name='message' id='message' placeholder='Quoi de neuf ?' value={text} onChange={(e) => setText(e.target.value)}/>
-                    <input className='' type='submit' value="Envoyer" />
+        <div className='d-flex flex-column mt-2'>
+            <form className='form bg-red' id='postForm' action='' onSubmit={sendPost}>
+                <div className='container d-flex flex-column'>
+                    <label className='form-label my-2 align-self-center fw-bold' htmlFor='message'>Déposez un nouvel article</label>
+                    <textarea className='text-area-post form-control my-1' name='message' id='message' placeholder='Quoi de neuf ?' value={text} onChange={(e) => setText(e.target.value)}/>
+                </div>
+                <div className='container d-flex flex-row justify-content-center mb-2'>
+                    <button className="btn btn-post mx-1" onClick={cancelPost}>Annuler</button>
+                    <button className='btn btn-post mx-1' type='submit'>Envoyer</button>
                 </div>
             </form>
-            <button className="" onClick={cancelPost}>Annuler</button>
         </div>
     );
 };

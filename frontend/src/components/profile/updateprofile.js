@@ -22,8 +22,8 @@ const UpdateProfile = () => {
     };
 
     return (
-        <div className='mt-4 mb-3'>
-            <div className='d-flex flex-column bg-red border border-2 rounded border-red mt-5'>
+        <div>
+            <div className='form d-flex flex-column bg-red mt-4'>
                 <h2 className='text-center mt-3 mb-4'>Mes informations</h2>
                 <div className='d-flex flex-column align-items-center mb-4'>
                     <div className='col-10 d-flex flex-column align-items-center mx-auto text-center'>
