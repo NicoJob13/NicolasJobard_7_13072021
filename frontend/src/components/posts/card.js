@@ -89,7 +89,6 @@ const Card = ({ post }) => {
                 },
             })
             .then((res) => {
-                cancelCom();
                 getComments();
                 setComIsUpdated(false);
             })
